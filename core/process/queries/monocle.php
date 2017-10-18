@@ -54,9 +54,9 @@ function req_all_pokemon()          //DONE
 // Single Pokemon
 ##########
 
-function req_pokemon_total_count($pokemon_id)    //DONE, but $pokemon_id is no $pid
+function req_pokemon_total_count($pokemon_id)    //DONE
 {
-    return "SELECT COUNT(*) AS pokemon_spawns FROM sightings WHERE pokemon_id = '".$pid."'";
+    return "SELECT COUNT(*) AS pokemon_spawns FROM sightings WHERE pokemon_id = '".$pokemon_id."'";
 }
 
 function req_pokemon_total_gym_protected($pokemon_id)  //DONE
