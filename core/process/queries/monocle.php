@@ -115,7 +115,7 @@ function req_pokemon_headmap_points($pokemon_id, $start, $end)         //DONE
     return "SELECT lat AS latitude, lon AS longitude FROM sightings".$where." ORDER BY (FROM_UNIXTIME(expire_timestamp)) DESC LIMIT 10000";
 }
 
-function req_pokemon_graph_data($pokemon_id)      //DONE
+function req_pokemon_graph_data($pokemon_id)
 {
     global $time_offset;
     return "SELECT COUNT(*) AS total,
@@ -125,10 +125,10 @@ function req_pokemon_graph_data($pokemon_id)      //DONE
         ORDER BY disappear_hour";
 }
 
-function req_pokemon_live_data_test($pokemon_id)
+function req_pokemon_live_data_test($pokemon_id)     //DONE
 {
-    $where = " WHERE disappear_time >= UTC_TIMESTAMP() AND pokemon_id = " . $pokemon_id;
-    return "SELECT MAX(individual_attack) AS iv FROM pokemon " . $where;
+    $where = " WHERE expire_timestamp >= UNIX_TIMESTAMP() AND pokemon_id = " . $pokemon_id;
+    return "SELECT MAX(atk_iv) AS iv FROM sightings " . $where;
 }
 
 function req_pokemon_live_data($pokemon_id, $testIv, $post)
@@ -177,15 +177,15 @@ function req_pokestop_count()      //DONE
     return "SELECT COUNT(*) AS total FROM pokestops";
 }
 
-function req_pokestop_lure_count()
+function req_pokestop_lure_count()    //DONE
 {
-    return "SELECT COUNT(*) AS total FROM pokestop WHERE lure_expiration >= UTC_TIMESTAMP()";
+    return "SELECT 0";
 }
 
-function req_pokestop_data()
+function req_pokestop_data()       //DONE
 {
     global $time_offset;
-    return "SELECT latitude, longitude, lure_expiration, UTC_TIMESTAMP() AS now, (CONVERT_TZ(lure_expiration, '+00:00', '" . $time_offset . "')) AS lure_expiration_real FROM pokestop ";
+    return "SELECT lat as latitude, lon as longitude, null as lure_expiration, UTC_TIMESTAMP() AS now, null AS lure_expiration_real FROM pokestops ";
 }
 
 // Gyms
@@ -201,9 +201,9 @@ function req_gym_count_for_team($team_id)     //DONE
     return "SELECT COUNT(DISTINCT(fort_id)) AS total FROM fort_sightings WHERE team = '$team_id'";
 }
 
-function req_gym_guards_for_team($team_id)
+function req_gym_guards_for_team($team_id)   //DONE
 {
-    return "SELECT COUNT(*) AS total, guard_pokemon_id FROM gym WHERE team_id = '$team_id' GROUP BY guard_pokemon_id ORDER BY total DESC LIMIT 0,3";
+    return "SELECT COUNT(*) AS total, guard_pokemon_id FROM fort_sightings WHERE team = '$team_id' GROUP BY guard_pokemon_id ORDER BY total DESC LIMIT 0,3";
 }
 
 function req_gym_count_cp_for_team($team_id)
@@ -347,12 +347,12 @@ function req_raids_data($page)
 				ORDER BY raids.level DESC, raids.time_battle" . $limit;
 }
 
-// Captcha -- NO EQUIVALENT IN MONOCLE
+// Captcha -- DONE
 ##########
 
 function req_captcha_count()
 {
-    return "SELECT SUM(accounts_captcha) AS total FROM mainworker";
+    return "SELECT 0";
 
 }
 
@@ -377,19 +377,19 @@ function req_tester_pokestop()
 // Nests
 ########
 
-function req_map_data()
+function req_map_data()      //DONE
 {
     global $config;
     $pokemon_exclude_sql = "";
     if (!empty($config->system->nest_exclude_pokemon)) {
         $pokemon_exclude_sql = "AND p.pokemon_id NOT IN (" . implode(",", $config->system->nest_exclude_pokemon) . ")";
     }
-    return "SELECT p.pokemon_id, max(p.latitude) AS latitude, max(p.longitude) AS longitude, count(p.pokemon_id) AS total_pokemon, s.latest_seen, (LENGTH(s.kind) - LENGTH( REPLACE ( kind, \"s\", \"\") )) * 900 AS duration
-          FROM pokemon p
-          INNER JOIN spawnpoint s ON (p.spawnpoint_id = s.id)
-          WHERE p.disappear_time > UTC_TIMESTAMP() - INTERVAL 24 HOUR
+    return "SELECT p.pokemon_id, p.lat AS latitude, p.lon AS longitude, count(p.pokemon_id) AS total_pokemon, s.updated, coalesce(duration,30)*60 as duration
+          FROM sightings p
+          INNER JOIN spawnpoints s ON (p.spawn_id = s.spawn_id)
+          WHERE p.expire_timestamp > UNIX_TIMESTAMP() - 86400
           " . $pokemon_exclude_sql . "
-          GROUP BY p.spawnpoint_id, p.pokemon_id
+          GROUP BY p.spawn_id, p.pokemon_id
           HAVING COUNT(p.pokemon_id) >= 6
           ORDER BY p.pokemon_id";
 }
