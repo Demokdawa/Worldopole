@@ -2,7 +2,7 @@
 
 // Manage Time Interval
 #######################
-include_once('../timezone.loader.php');
+include_once(SYS_PATH.'/core/process/timezone.loader.php');
 
 
 // Genearl -- DONE
