@@ -176,6 +176,10 @@
 <script>
 	document.addEventListener('DOMContentLoaded', function() {
 		<?php
+		foreach ($parameters as $key => $value) {
+			echo '<script>console.log('.$key.')</script>'; //TEMP
+		}
+		
 		foreach (array_reverse($timers) as $id => $countdown) { ?>
 			startTimer(<?= $countdown ?>,"<?= $id ?>");
 		<?php
