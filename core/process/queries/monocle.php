@@ -30,6 +30,7 @@ function req_pokemon_count_id()          //DONE
 
 function req_mystic_pokemon($mythic_pokemon)    //DONE
 {
+    echo '<script>console.log($mythic_pokemon)</script>';
     global $time_offset;
     return "SELECT DISTINCT pokemon_id, encounter_id, FROM_UNIXTIME(expire_timestamp) AS disappear_time, updated AS last_modified, ( CONVERT_TZ( FROM_UNIXTIME(expire_timestamp), '+00:00', '".$time_offset."') ) AS disappear_time_real,
 				sightings.lat AS latitude, sightings.lon AS longitude, cp, atk_iv AS individual_attack, def_iv AS individual_defense, sta_iv AS individual_stamina
@@ -208,7 +209,7 @@ function req_gym_guards_for_team($team_id)   //DONE
 
 function req_gym_count_cp_for_team($team_id)
 {
-    return "SELECT COUNT(DISTINCT(fs.fort_id)) AS total, (ROUND(SUM(gd.cp),0) / COUNT(DISTINCT(fs.fort_id))) AS average_points
+    return "SELECT COUNT(DISTINCT(fs.fort_id)) AS total, ROUND((SUM(gd.cp),0) / COUNT(DISTINCT(fs.fort_id))) AS average_points
         FROM fort_sightings fs
         JOIN gym_defenders gd ON fs.fort_id = gd.fort_id
         WHERE fs.team = '$team_id'";
