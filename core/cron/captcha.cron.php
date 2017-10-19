@@ -8,7 +8,7 @@
 // Load Queries
 // #############
 
-include_once('../process/query.php');
+include_once(SYS_PATH.'/core/process/query.php');
 
 $captcha_file = SYS_PATH.'/core/json/captcha.stats.json';
 if (is_file($captcha_file)) {
