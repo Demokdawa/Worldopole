@@ -403,8 +403,6 @@ else {
 		// get all pokemon
         $req_poke = req_all_pokemon();
     }
-	error_log("Test"); //TEMP
-	error_log($req_poke); //TEMP
     $result = $mysqli->query($req_poke);
 	$recents	= array();
 
