@@ -30,7 +30,7 @@ function req_pokemon_count_id()          //DONE
 
 function req_mystic_pokemon($mythic_pokemon)    //DONE
 {
-    return "SELECT DISTINCT pokemon_id, encounter_id, FROM_UNIXTIME(expire_timestamp) AS disappear_time, FROM_UNIXTIME(sightings.updated) AS last_modified, FROM_UNIXTIME(expire_timestamp) AS disappear_time_real,
+    return "SELECT DISTINCT pokemon_id, CONCAT('A', encounter_id) as encounter_id, FROM_UNIXTIME(expire_timestamp) AS disappear_time, FROM_UNIXTIME(sightings.updated) AS last_modified, FROM_UNIXTIME(expire_timestamp) AS disappear_time_real,
 				sightings.lat AS latitude, sightings.lon AS longitude, cp, atk_iv AS individual_attack, def_iv AS individual_defense, sta_iv AS individual_stamina
 				FROM sightings, spawnpoints
 				WHERE pokemon_id IN (".implode(",", $mythic_pokemon).") AND sightings.spawn_id = spawnpoints.spawn_id
@@ -40,7 +40,7 @@ function req_mystic_pokemon($mythic_pokemon)    //DONE
 
 function req_all_pokemon()          //DONE
 {
-    return "SELECT DISTINCT pokemon_id, encounter_id, FROM_UNIXTIME(expire_timestamp) AS disappear_time, FROM_UNIXTIME(updated) AS last_modified, FROM_UNIXTIME(expire_timestamp) AS disappear_time_real,
+    return "SELECT DISTINCT pokemon_id, CONCAT('A', encounter_id) as encounter_id, FROM_UNIXTIME(expire_timestamp) AS disappear_time, FROM_UNIXTIME(updated) AS last_modified, FROM_UNIXTIME(expire_timestamp) AS disappear_time_real,
 				sightings.lat AS latitude, sightings.lon AS longitude, cp, atk_iv AS individual_attack, def_iv AS individual_defense, sta_iv AS individual_stamina
 				FROM sightings, spawnpoints
 				WHERE sightings.spawn_id = spawnpoints.spawn_id
@@ -146,8 +146,8 @@ function req_pokemon_live_data($pokemon_id, $testIv, $post)
         $ivMax = mysqli_real_escape_string($mysqli, $post['ivMax']);
         $where .= " AND ((100/45)*(individual_attack+individual_defense+individual_stamina)) <=(" . $ivMax . ") ";
     }
-    return "SELECT pokemon_id, encounter_id, latitude, longitude, disappear_time,
-						disappear_time AS disappear_time_real,
+    return "SELECT pokemon_id, latitude, longitude, FROM_UNIXTIME(disappear_time),
+						FROM_UNIXTIME(disappear_time) AS disappear_time_real,
 						individual_attack, individual_defense, individual_stamina, move_1, move_2
 						FROM pokemon " . $where . "
 						ORDER BY disappear_time DESC
