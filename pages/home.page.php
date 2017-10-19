@@ -132,7 +132,8 @@
 				</div>
 			<?php
 			// Array with ids and countdowns to start at the end of this file
-			echo '<script>console.log('.$uid.": ".($pokemon->last_seen - time()).')</script>'; //TEMP
+			echo '<script>console.log('.$uid.')</script>'; //TEMP
+			echo '<script>console.log('.($pokemon->last_seen - time()).')</script>'; //TEMP
 			$timers[$uid] = $pokemon->last_seen - time();
 		} ?>
 		</div>
