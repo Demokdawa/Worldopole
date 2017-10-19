@@ -64,8 +64,7 @@ function req_pokemon_total_gym_protected($pokemon_id)  //DONE
 
 function req_pokemon_last_seen($pokemon_id)     //DONE
 {
-    global $time_offset;
-    return "SELECT FROM_UNIXTIME(expire_timestamp) AS expire_timestamp, ( CONVERT_TZ( FROM_UNIXTIME(expire_timestamp), '+00:00', '".$time_offset."' ) ) AS disappear_time_real, lat AS latitude, lon AS longitude
+    return "SELECT FROM_UNIXTIME(expire_timestamp) AS expire_timestamp, ROM_UNIXTIME(expire_timestamp) AS disappear_time_real, lat AS latitude, lon AS longitude
                 FROM sightings
                 WHERE pokemon_id = '".$pokemon_id."'
                 ORDER BY expire_timestamp DESC
@@ -74,8 +73,7 @@ function req_pokemon_last_seen($pokemon_id)     //DONE
 
 function req_pokemon_get_top_50($pokemon_id, $top_order_by, $top_direction)
 {
-    global $time_offset;
-    return "SELECT (CONVERT_TZ(disappear_time, '+00:00', '" . $time_offset . "')) AS distime, pokemon_id, disappear_time, latitude, longitude,
+    return "disappear_time AS distime, pokemon_id, disappear_time, latitude, longitude,
 	            cp, individual_attack, individual_defense, individual_stamina,
 	            ROUND(SUM(100*(individual_attack+individual_defense+individual_stamina)/45),1) AS IV, move_1, move_2, form
 	            FROM pokemon
@@ -115,9 +113,8 @@ function req_pokemon_headmap_points($pokemon_id, $start, $end)         //DONE
 
 function req_pokemon_graph_data($pokemon_id)
 {
-    global $time_offset;
     return "SELECT COUNT(*) AS total,
-        HOUR(CONVERT_TZ(FROM_UNIXTIME(disappear_time), '+00:00', '".$time_offset."')) AS disappear_hour
+        HOUR(FROM_UNIXTIME(disappear_time)) AS disappear_hour
         FROM (SELECT FROM_UNIXTIME(disappear_time) FROM sightings WHERE pokemon_id = '".$pokemon_id."' ORDER BY disappear_time LIMIT 10000) AS pokemonFiltered
         GROUP BY disappear_hour
         ORDER BY disappear_hour";
@@ -131,7 +128,7 @@ function req_pokemon_live_data_test($pokemon_id)     //DONE
 
 function req_pokemon_live_data($pokemon_id, $testIv, $post)
 {
-    global $mysqli, $time_offset;
+    global $mysqli;
     $inmap_pkms_filter = "";
     $where = " WHERE disappear_time >= UTC_TIMESTAMP() AND pokemon_id = " . $pokemon_id;
     if (isset($post['inmap_pokemons']) && ($post['inmap_pokemons'] != "")) {
@@ -150,7 +147,7 @@ function req_pokemon_live_data($pokemon_id, $testIv, $post)
         $where .= " AND ((100/45)*(individual_attack+individual_defense+individual_stamina)) <=(" . $ivMax . ") ";
     }
     return "SELECT pokemon_id, encounter_id, latitude, longitude, disappear_time,
-						(CONVERT_TZ(disappear_time, '+00:00', '" . $time_offset . "')) AS disappear_time_real,
+						disappear_time AS disappear_time_real,
 						individual_attack, individual_defense, individual_stamina, move_1, move_2
 						FROM pokemon " . $where . "
 						ORDER BY disappear_time DESC
@@ -182,7 +179,6 @@ function req_pokestop_lure_count()    //DONE
 
 function req_pokestop_data()       //DONE
 {
-    global $time_offset;
     return "SELECT lat as latitude, lon as longitude, null as lure_expiration, UTC_TIMESTAMP() AS now, null AS lure_expiration_real FROM pokestops ";
 }
 
@@ -214,24 +210,21 @@ function req_gym_count_cp_for_team($team_id)
 
 function req_gym_data()       //DONE
 {
-    global $time_offset;
-    return "SELECT fort_id AS gym_id, team AS team_id, lat AS latitude, lon AS longitude, ( CONVERT_TZ( FROM_UNIXTIME(updated), '+00:00', '".$time_offset."')) AS last_scanned, (6 - slots_available) AS level
+    return "SELECT fort_id AS gym_id, team AS team_id, lat AS latitude, lon AS longitude, FROM_UNIXTIME(updated) AS last_scanned, (6 - slots_available) AS level
 				FROM forts, fort_sightings
 				WHERE forts.id = fort_sightings.fort_id";
 }
 
 function req_gym_data_simple($gym_id)
 {
-    global $time_offset;
-    return "SELECT gym_id, team_id, guard_pokemon_id, latitude, longitude, (CONVERT_TZ(last_scanned, '+00:00', '" . $time_offset . "')) AS last_scanned, total_cp, (6 - slots_available) AS level
+    return "SELECT gym_id, team_id, guard_pokemon_id, latitude, longitude, last_scanned AS last_scanned, total_cp, (6 - slots_available) AS level
 				FROM gym WHERE gym_id='" . $gym_id . "'";
 }
 
 function req_gym_defender_for($gym_id)
 {
-    global $time_offset;
     return "SELECT gymdetails.name AS name, gymdetails.description AS description, gymdetails.url AS url, gym.team_id AS team,
-	            (CONVERT_TZ(gym.last_scanned, '+00:00', '" . $time_offset . "')) AS last_scanned, gym.guard_pokemon_id AS guard_pokemon_id, gym.total_cp AS total_cp, (6 - gym.slots_available) AS level
+	            gym.last_scanned AS last_scanned, gym.guard_pokemon_id AS guard_pokemon_id, gym.total_cp AS total_cp, (6 - gym.slots_available) AS level
 			    FROM gymdetails
 			    LEFT JOIN gym ON gym.gym_id = gymdetails.gym_id
 			    WHERE gym.gym_id='" . $gym_id . "'";
@@ -299,8 +292,7 @@ function req_trainers($get)
 
 function req_trainer_active_pokemon($name)
 {
-    global $time_offset;
-    return "(SELECT DISTINCT gympokemon.pokemon_id, gympokemon.pokemon_uid, gympokemon.cp, DATEDIFF(UTC_TIMESTAMP(), gympokemon.last_seen) AS last_scanned, gympokemon.trainer_name, gympokemon.iv_defense, gympokemon.iv_stamina, gympokemon.iv_attack, filtered_gymmember.gym_id, CONVERT_TZ(filtered_gymmember.deployment_time, '+00:00', '" . $time_offset . "') as deployment_time, '1' AS active
+    return "(SELECT DISTINCT gympokemon.pokemon_id, gympokemon.pokemon_uid, gympokemon.cp, DATEDIFF(UTC_TIMESTAMP(), gympokemon.last_seen) AS last_scanned, gympokemon.trainer_name, gympokemon.iv_defense, gympokemon.iv_stamina, gympokemon.iv_attack, filtered_gymmember.gym_id, filtered_gymmember.deployment_time as deployment_time, '1' AS active
 	            FROM gympokemon INNER JOIN
 				(SELECT gymmember.pokemon_uid, gymmember.gym_id, gymmember.deployment_time FROM gymmember GROUP BY gymmember.pokemon_uid, gymmember.deployment_time, gymmember.gym_id HAVING gymmember.gym_id <> '') AS filtered_gymmember
 				ON gympokemon.pokemon_uid = filtered_gymmember.pokemon_uid
@@ -310,8 +302,7 @@ function req_trainer_active_pokemon($name)
 
 function req_trainer_inactive_pokemon($name)
 {
-    global $time_offset;
-    return "(SELECT DISTINCT gympokemon.pokemon_id, gympokemon.pokemon_uid, gympokemon.cp, DATEDIFF(UTC_TIMESTAMP(), gympokemon.last_seen) AS last_scanned, gympokemon.trainer_name, gympokemon.iv_defense, gympokemon.iv_stamina, gympokemon.iv_attack, null AS gym_id, CONVERT_TZ(filtered_gymmember.deployment_time, '+00:00', '" . $time_offset . "') as deployment_time, '0' AS active
+    return "(SELECT DISTINCT gympokemon.pokemon_id, gympokemon.pokemon_uid, gympokemon.cp, DATEDIFF(UTC_TIMESTAMP(), gympokemon.last_seen) AS last_scanned, gympokemon.trainer_name, gympokemon.iv_defense, gympokemon.iv_stamina, gympokemon.iv_attack, null AS gym_id, filtered_gymmember.deployment_time as deployment_time, '0' AS active
 				FROM gympokemon LEFT JOIN
 				(SELECT * FROM gymmember HAVING gymmember.gym_id <> '') AS filtered_gymmember
 				ON gympokemon.pokemon_uid = filtered_gymmember.pokemon_uid
@@ -345,9 +336,8 @@ function req_trainer_levels_for_team($teamid)
 
 function req_raids_data($page)
 {
-    global $time_offset;
     $limit = " LIMIT " . ($page * 10) . ",10";
-    return "SELECT raids.fort_id AS gym_id, raids.level AS level, raids.pokemon_id AS pokemon_id, raids.cp AS cp, raids.move_1 AS move_1, raids.move_2 AS move_2, ( CONVERT_TZ( FROM_UNIXTIME(raids.time_spawn), '+00:00', '".$time_offset."')) AS spawn, ( CONVERT_TZ( FROM_UNIXTIME(raids.time_battle), '+00:00', '".$time_offset."')) AS start, ( CONVERT_TZ( FROM_UNIXTIME(raids.time_end), '+00:00', '".$time_offset."')) AS end, ( CONVERT_TZ( FROM_UNIXTIME(fort_sightings.updated), '+00:00', '".$time_offset."')) AS last_scanned, forts.name, forts.lat AS latitude, forts.lon as longitude FROM raids
+    return "SELECT raids.fort_id AS gym_id, raids.level AS level, raids.pokemon_id AS pokemon_id, raids.cp AS cp, raids.move_1 AS move_1, raids.move_2 AS move_2, FROM_UNIXTIME(raids.time_spawn) AS spawn, FROM_UNIXTIME(raids.time_battle) AS start, FROM_UNIXTIME(raids.time_end) AS end, FROM_UNIXTIME(fort_sightings.updated) AS last_scanned, forts.name, forts.lat AS latitude, forts.lon as longitude FROM raids
 				JOIN forts ON forts.id = raids.fort_id
 				JOIN fort_sightings ON fort_sightings.fort_id = raids.fort_id
 				WHERE raids.time_end > UNIX_TIMESTAMP()
