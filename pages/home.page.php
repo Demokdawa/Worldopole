@@ -132,8 +132,6 @@
 				</div>
 			<?php
 			// Array with ids and countdowns to start at the end of this file
-			echo '<script>console.log('.$uid.')</script>'; //TEMP
-			echo '<script>console.log('.($pokemon->last_seen - time()).')</script>'; //TEMP
 			$timers[$uid] = $pokemon->last_seen - time();
 		} ?>
 		</div>
@@ -176,10 +174,6 @@
 <script>
 	document.addEventListener('DOMContentLoaded', function() {
 		<?php
-		foreach ($parameters as $key => $value) {
-			echo '<script>console.log('.$key.')</script>'; //TEMP
-		}
-		
 		foreach (array_reverse($timers) as $id => $countdown) { ?>
 			startTimer(<?= $countdown ?>,"<?= $id ?>");
 		<?php
