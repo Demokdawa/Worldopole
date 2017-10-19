@@ -8,7 +8,7 @@
 // Load Queries
 // #############
 
-include_once('query.php');
+include_once('../process/query.php');
 
 // This file is used to rank by rarity 
 
