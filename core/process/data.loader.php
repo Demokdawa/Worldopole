@@ -400,7 +400,7 @@ else {
 			}
 		}
 		// get all mythic pokemon
-		echo '<script>console.log($mythic_pokemons)</script>'; //TEMP
+		echo '<script>console.log('.$mythic_pokemons.')</script>'; //TEMP
         $req_poke = req_mystic_pokemon($mythic_pokemons);
 	} else {
 		// get all pokemon
