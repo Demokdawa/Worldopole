@@ -30,12 +30,12 @@ function req_pokemon_count_id()          //DONE
 
 function req_mystic_pokemon($mythic_pokemon)    //DONE
 {
-    echo '<script>console.log($mythic_pokemons)</script>';
+    echo '<script>console.log($mythic_pokemon)</script>';
     global $time_offset;
     return "SELECT DISTINCT pokemon_id, encounter_id, FROM_UNIXTIME(expire_timestamp) AS disappear_time, updated AS last_modified, ( CONVERT_TZ( FROM_UNIXTIME(expire_timestamp), '+00:00', '".$time_offset."') ) AS disappear_time_real,
 				sightings.lat AS latitude, sightings.lon AS longitude, cp, atk_iv AS individual_attack, def_iv AS individual_defense, sta_iv AS individual_stamina
 				FROM sightings, spawnpoints
-				WHERE pokemon_id IN (".implode(",", $mythic_pokemons).") AND sightings.spawn_id = spawnpoints.spawn_id
+				WHERE pokemon_id IN (".implode(",", $mythic_pokemon).") AND sightings.spawn_id = spawnpoints.spawn_id
 				ORDER BY last_modified DESC
 				LIMIT 0,12";
 }
