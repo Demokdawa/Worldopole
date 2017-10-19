@@ -179,7 +179,7 @@ function req_pokestop_count()      //DONE
 
 function req_pokestop_lure_count()    //DONE
 {
-    return "SELECT 0";
+    return "SELECT 0 AS total";
 }
 
 function req_pokestop_data()       //DONE
