@@ -3,7 +3,7 @@
 // Load Queries
 // #############
 
-include_once('query.php');
+include_once('../process/query.php');
 
 // get alltime pokemon counts for pokedex and pokemon pages
 
