@@ -9,7 +9,7 @@
 // Load Queries
 // #############
 
-include_once('../process/query.php');
+include_once(SYS_PATH.'/core/process/query.php');
 
 $result = $mysqli->query(req_map_data());
 

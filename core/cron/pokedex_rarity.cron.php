@@ -3,7 +3,7 @@
 // Load Queries
 // #############
 
-include_once('../process/query.php');
+include_once(SYS_PATH.'/core/process/query.php');
 
 // get pokemon from last day to calculate the rarity for last 24h
 // use last disappear_time as a starting point to overcome scan downtimes
