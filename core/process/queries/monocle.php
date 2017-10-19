@@ -200,7 +200,7 @@ function req_gym_guards_for_team($team_id)   //DONE
     return "SELECT COUNT(*) AS total, guard_pokemon_id FROM fort_sightings WHERE team = '$team_id' GROUP BY guard_pokemon_id ORDER BY total DESC LIMIT 0,3";
 }
 
-function req_gym_count_cp_for_team($team_id)
+function req_gym_count_cp_for_team($team_id) //DONE
 {
     return "SELECT COUNT(DISTINCT(fs.fort_id)) AS total, ROUND((SUM(gd.cp),0) / COUNT(DISTINCT(fs.fort_id))) AS average_points
         FROM fort_sightings fs
@@ -217,14 +217,14 @@ function req_gym_data()       //DONE
 
 function req_gym_data_simple($gym_id)
 {
-    return "SELECT gym_id, team_id, guard_pokemon_id, latitude, longitude, last_scanned AS last_scanned, total_cp, (6 - slots_available) AS level
+    return "SELECT gym_id, team_id, guard_pokemon_id, latitude, longitude, FROM_UNIXTIME(last_scanned) AS last_scanned, total_cp, (6 - slots_available) AS level
 				FROM gym WHERE gym_id='" . $gym_id . "'";
 }
 
 function req_gym_defender_for($gym_id)
 {
     return "SELECT gymdetails.name AS name, gymdetails.description AS description, gymdetails.url AS url, gym.team_id AS team,
-	            gym.last_scanned AS last_scanned, gym.guard_pokemon_id AS guard_pokemon_id, gym.total_cp AS total_cp, (6 - gym.slots_available) AS level
+	            FROM_UNIXTIME(gym.last_scanned) AS last_scanned, gym.guard_pokemon_id AS guard_pokemon_id, gym.total_cp AS total_cp, (6 - gym.slots_available) AS level
 			    FROM gymdetails
 			    LEFT JOIN gym ON gym.gym_id = gymdetails.gym_id
 			    WHERE gym.gym_id='" . $gym_id . "'";
