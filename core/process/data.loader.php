@@ -391,16 +391,13 @@ else {
 
 	if ($config->system->recents_filter) {
 		// get all mythic pokemon ids
-		echo '<script>console.log("Test")</script>'; //TEMP
 		$mythic_pokemons = array();
 		foreach ($pokemons->pokemon as $id => $pokemon) {
 			if ($pokemon->spawn_rate < $config->system->recents_filter_rarity && $pokemon->rating >= $config->system->recents_filter_rating) {
 				$mythic_pokemons[] = $id;
-				echo '<script>console.log("Added Pokemon")</script>'; //TEMP
 			}
 		}
 		// get all mythic pokemon
-		echo '<script>console.log('.implode(",", $mythic_pokemons).')</script>'; //TEMP
         $req_poke = req_mystic_pokemon($mythic_pokemons);
 	} else {
 		// get all pokemon
