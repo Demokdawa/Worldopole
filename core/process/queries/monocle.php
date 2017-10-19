@@ -208,7 +208,10 @@ function req_gym_guards_for_team($team_id)   //DONE
 
 function req_gym_count_cp_for_team($team_id)
 {
-    return "SELECT COUNT(DISTINCT(gym_id)) AS total, ROUND(AVG(total_cp),0) AS average_points FROM gym WHERE team_id = '$team_id'";
+    return "SELECT COUNT(DISTINCT(fs.fort_id)) AS total, (ROUND(SUM(gd.cp),0) / COUNT(DISTINCT(fs.fort_id))) AS average_points
+        FROM fort_sightings fs
+        JOIN gymdefenders gd ON fs.fort_id = gd.fort_id
+        WHERE fs.team = '$team_id'";
 }
 
 function req_gym_data()       //DONE
