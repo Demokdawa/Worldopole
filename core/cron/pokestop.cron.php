@@ -10,7 +10,7 @@
 // Load Queries
 // #############
 
-include_once('query.php');
+include_once('../process/query.php');
 
 $pokestop['timestamp'] = $timestamp;
 
